@@ -1,0 +1,3 @@
+- (BOOL)isGithubAvaliable
+- (KSGithubStatus)githubStatus
+- ({BOOL|void})refresh
