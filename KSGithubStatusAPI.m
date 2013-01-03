@@ -19,15 +19,18 @@ static NSString * const kGithubLastAPIString = @"last-message.json";
 static NSString * const kGithubStatusKey = @"status";
 static NSString * const kGithubMessageKey = @"body";
 static NSString * const kGithubDateKey = @"created_on";
+static NSString * const kGithubPrettyDateKey = @"created_on_pretty";
 
 static NSString * const kGithubNormalStatus = @"good";
+static NSString * const kGithubMinorStatus = @"minor";
 
 static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked";
+
 
 @interface KSGithubStatusAPI()
 
 @property (nonatomic, strong) NSMutableArray *validResponses;
-@property (nonatomic, strong) NSNumber *currentAvailability;
+@property (nonatomic, strong) NSString *currentAvailability;
 @property (nonatomic, strong) NSDictionary *currentStatus;
 @property (nonatomic, strong) NSDate *lastRefresh;
 
@@ -53,7 +56,7 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
         return nil;
     }
     
-    self.validResponses = [NSMutableArray arrayWithObjects:kGithubNormalStatus, nil];
+    self.validResponses = [NSMutableArray arrayWithObjects:kGithubNormalStatus, kGithubMinorStatus, nil];
     
     if ([[NSUserDefaults standardUserDefaults] valueForKey:kGithubLastCheckedKey]) {
         self.lastRefresh = [[NSUserDefaults standardUserDefaults] valueForKey:kGithubLastCheckedKey];
@@ -68,8 +71,10 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
 
 - (void)checkStatus:(void(^)(NSNumber *available, NSError *error))block
 {
+    // Check status.github.com to make sure it's available
     if (![[Reachability reachabilityWithHostname:kGithubStatusReachabilityString] isReachable])
     {
+        // If status.github.com is down check github.com
         if ([[Reachability reachabilityWithHostname:kGithubReachabilityString] isReachable]) {
             if (block) {
                 block(@YES, nil);
@@ -89,18 +94,48 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
                                                                                         success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON)
     {
         self.lastRefresh = [NSDate date];
+        self.currentAvailability = [JSON valueForKey:kGithubStatusKey];
         
-        if ([JSON valueForKey:kGithubStatusKey]) {
-            
+        if ([JSON valueForKey:kGithubDateKey]) {
+            NSString *dateString = [JSON valueForKey:kGithubDateKey];
+            NSDate *githubUpdateDate = [NSDate dateWithNaturalLanguageString:[JSON valueForKey:kGithubDateKey]];
+            if (githubUpdateDate) {
+                [self setCurrentStatusWithStatus:[JSON valueForKey:kGithubStatusKey]
+                                         message:[JSON valueForKey:kGithubMessageKey]
+                                            date:githubUpdateDate
+                                      prettyDate:[self prettyDateFromDate:githubUpdateDate]];
+            } else {
+                [self setCurrentStatusWithStatus:[JSON valueForKey:kGithubStatusKey]
+                                         message:[JSON valueForKey:kGithubMessageKey]
+                                            date:nil
+                                      prettyDate:dateString];
+            }
+        } else {
+            [self setCurrentStatusWithStatus:[JSON valueForKey:kGithubStatusKey]
+                                     message:[JSON valueForKey:kGithubMessageKey]
+                                        date:nil
+                                  prettyDate:nil];
         }
+        
     }
                                                                                         failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON)
     {
         self.lastRefresh = [NSDate date];
+        self.currentAvailability = nil;
         
+        if (block) {
+            block(@NO, [self requestFailedError]);
+        }
     }];
     
     [operation start];
+}
+
+- (void)setLastRefresh:(NSDate *)lastRefreshDate
+{
+    [[NSUserDefaults standardUserDefaults] setObject:lastRefreshDate forKey:kGithubLastCheckedKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    self.lastRefresh = lastRefreshDate;
 }
 
 
@@ -111,9 +146,9 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
     [self checkStatus:nil];
 }
 
-- (BOOL)isGithubAvaliable
+- (BOOL)isGithubAvailable
 {
-    self checkStatus:<#^(NSNumber *available, NSError *error)block#>
+    return [self isAcceptableResponse:self.currentAvailability];
 }
 
 - (NSDictionary *)currentStatus
@@ -123,9 +158,10 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
 
 - (void)setCurrentStatusWithStatus:(NSString *)status
                            message:(NSString *)message
-                       dataCreated:(NSDate *)date
+                              date:(NSDate *)date
+                        prettyDate:(NSString *)prettyDate
 {
-    self.currentStatus = @{kGithubStatusKey : status, kGithubMessageKey : message, kGithubDateKey : date};
+    self.currentStatus = @{kGithubStatusKey : status, kGithubMessageKey : message, kGithubDateKey : date, kGithubPrettyDateKey : prettyDate};
 }
 
 - (NSDate *)lastCheckedDate
@@ -133,9 +169,9 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
     return self.lastRefresh;
 }
 
-- (NSString *)lastCheckedDateString
+- (NSString *)lastCheckedPrettyDate
 {
-    [self prettyDateFromDate:self.lastRefresh];
+    return [self prettyDateFromDate:self.lastRefresh];
 }
 
 - (NSString *)prettyDateFromDate:(NSDate *)date
@@ -148,6 +184,11 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
 }
 
 #pragma mark - Acceptable Responses
+
+- (BOOL)isAcceptableResponse:(NSString *)response
+{
+    return [self.validResponses containsObject:response];
+}
 
 - (NSArray *)acceptableResponses
 {
@@ -173,6 +214,11 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
 - (NSError *)statusUnreachableError
 {
 //    return [NSError errorWithDomain:<#(NSString *)#> code:<#(NSInteger)#> userInfo:<#(NSDictionary *)#>]
+}
+
+- (NSError *)requestFailedError
+{
+    
 }
 
 @end

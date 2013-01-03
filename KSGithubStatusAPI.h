@@ -12,13 +12,5 @@
 
 + (KSGithubStatusAPI *)sharedClient;
 
-- (void)refresh;
-
-- (NSDate *)lastCheckedDate;
-- (NSString *)lastCheckedDateString;
-
-- (NSArray *)acceptableResponses;
-- (void)addAcceptableResponse:(NSString *)response;
-- (void)addAcceptableResponses:(NSArray *)responses;
 
 @end
