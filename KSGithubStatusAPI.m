@@ -11,30 +11,36 @@
 #import "AFNetworking.h"
 #import "Reachability.h"
 
-// Github strings
+// Github URL strings
 static NSString * const kGithubAPIURLString = @"https://status.github.com/api/";
 static NSString * const kGithubStatusReachabilityString = @"status.github.com";
 static NSString * const kGithubReachabilityString = @"github.com";
 static NSString * const kGithubLastAPIString = @"last-message.json";
-static NSString * const kGithubStatusKey = @"status";
-static NSString * const kGithubMessageKey = @"body";
-static NSString * const kGithubDateKey = @"created_on";
-static NSString * const kGithubPrettyDateKey = @"created_on_pretty";
 
+// Github Status Strings
 static NSString * const kGithubNormalStatus = @"good";
 static NSString * const kGithubMinorStatus = @"minor";
+static NSString * const kGithubErrorStatus = @"error";
 
 static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked";
+NSString * const KSGithubStatusErrorDomain = @"com.keithsmiley.KSGithubStatusAPI";
 
 
 @interface KSGithubStatusAPI()
-
+// List of acceptable responses
 @property (nonatomic, strong) NSMutableArray *validResponses;
+
+// Most recent response string
 @property (nonatomic, strong) NSString *currentAvailability;
-@property (nonatomic, strong) NSDictionary *currentStatus;
+
+// All info passed from github on last check
+@property (nonatomic, strong) NSDictionary *currentGithubStatus;
+
+// The time of the last status check
 @property (nonatomic, strong) NSDate *lastRefresh;
 
 @end
+
 
 @implementation KSGithubStatusAPI
 
@@ -56,12 +62,13 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
         return nil;
     }
     
+    // Populate valid responses
     self.validResponses = [NSMutableArray arrayWithObjects:kGithubNormalStatus, kGithubMinorStatus, nil];
-    
+
     if ([[NSUserDefaults standardUserDefaults] valueForKey:kGithubLastCheckedKey]) {
-        self.lastRefresh = [[NSUserDefaults standardUserDefaults] valueForKey:kGithubLastCheckedKey];
+        [self setLastChecked:[[NSUserDefaults standardUserDefaults] valueForKey:kGithubLastCheckedKey]];
     } else {
-        self.lastRefresh = [NSDate distantPast];
+        [self setLastChecked:[NSDate distantPast]];
     }
     
     return self;
@@ -74,15 +81,19 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
     // Check status.github.com to make sure it's available
     if (![[Reachability reachabilityWithHostname:kGithubStatusReachabilityString] isReachable])
     {
+        [self setLastChecked:[NSDate date]];
+
         // If status.github.com is down check github.com
         if ([[Reachability reachabilityWithHostname:kGithubReachabilityString] isReachable]) {
             if (block) {
                 block(@YES, nil);
             }
+            self.currentAvailability = kGithubNormalStatus;
         } else {
             if (block) {
                 block(@NO, [self statusUnreachableError]);
             }
+            self.currentAvailability = kGithubErrorStatus;
         }
         
         return;
@@ -93,53 +104,84 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
     AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request
                                                                                         success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON)
     {
-        self.lastRefresh = [NSDate date];
+        [self setLastChecked:[NSDate date]];
+
         self.currentAvailability = [JSON valueForKey:kGithubStatusKey];
         
-        if ([JSON valueForKey:kGithubDateKey]) {
+        if ([JSON valueForKey:kGithubDateKey])
+        {
             NSString *dateString = [JSON valueForKey:kGithubDateKey];
             NSDate *githubUpdateDate = [NSDate dateWithNaturalLanguageString:[JSON valueForKey:kGithubDateKey]];
-            if (githubUpdateDate) {
+            if (githubUpdateDate)
+            {
                 [self setCurrentStatusWithStatus:[JSON valueForKey:kGithubStatusKey]
                                          message:[JSON valueForKey:kGithubMessageKey]
                                             date:githubUpdateDate
                                       prettyDate:[self prettyDateFromDate:githubUpdateDate]];
-            } else {
+            }
+            else
+            {
                 [self setCurrentStatusWithStatus:[JSON valueForKey:kGithubStatusKey]
                                          message:[JSON valueForKey:kGithubMessageKey]
                                             date:nil
                                       prettyDate:dateString];
             }
-        } else {
+        }
+        else
+        {
             [self setCurrentStatusWithStatus:[JSON valueForKey:kGithubStatusKey]
                                      message:[JSON valueForKey:kGithubMessageKey]
                                         date:nil
                                   prettyDate:nil];
         }
         
+        if (block) {
+            if ([self isGithubAvailable]) {
+                block(@YES, nil);
+            } else {
+                block(@NO, nil);
+            }
+        }
+        
     }
                                                                                         failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON)
     {
-        self.lastRefresh = [NSDate date];
+        [self setLastChecked:[NSDate date]];
         self.currentAvailability = nil;
         
         if (block) {
-            block(@NO, [self requestFailedError]);
+            block(@NO, [self unknownError]);
         }
+        
+        NSLog(@"KSGithubStatusAPI Error %@ : %@", [error localizedDescription], error);
     }];
     
     [operation start];
 }
 
-- (void)setLastRefresh:(NSDate *)lastRefreshDate
+- (void)setLastChecked:(NSDate *)lastChecked
 {
-    [[NSUserDefaults standardUserDefaults] setObject:lastRefreshDate forKey:kGithubLastCheckedKey];
+    [[NSUserDefaults standardUserDefaults] setObject:lastChecked forKey:kGithubLastCheckedKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    self.lastRefresh = lastRefreshDate;
+    
+    self.lastRefresh = lastChecked;
 }
 
 
 #pragma mark - Helper methods
+
+- (KSGithubStatus)currentStatus
+{
+    if ([self.currentAvailability isEqualToString:kGithubNormalStatus]) {
+        return KSGithubStatusNormal;
+    } else if ([self.currentAvailability isEqualToString:kGithubMinorStatus]) {
+        return KSGithubStatusMinor;
+    } else if ([self.currentAvailability isEqualToString:kGithubErrorStatus]) {
+        return KSGithubStatusError;
+    } else {
+        return KSGithubStatusUnknown;
+    }
+}
 
 - (void)refresh
 {
@@ -151,9 +193,9 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
     return [self isAcceptableResponse:self.currentAvailability];
 }
 
-- (NSDictionary *)currentStatus
+- (NSDictionary *)currentStatusDetails
 {
-    return self.currentStatus;
+    return self.currentGithubStatus;
 }
 
 - (void)setCurrentStatusWithStatus:(NSString *)status
@@ -161,7 +203,7 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
                               date:(NSDate *)date
                         prettyDate:(NSString *)prettyDate
 {
-    self.currentStatus = @{kGithubStatusKey : status, kGithubMessageKey : message, kGithubDateKey : date, kGithubPrettyDateKey : prettyDate};
+    self.currentGithubStatus = @{kGithubStatusKey : status, kGithubMessageKey : message, kGithubDateKey : date, kGithubPrettyDateKey : prettyDate};
 }
 
 - (NSDate *)lastCheckedDate
@@ -213,12 +255,20 @@ static NSString * const kGithubLastCheckedKey = @"githubAvailabilityLastChecked"
 
 - (NSError *)statusUnreachableError
 {
-//    return [NSError errorWithDomain:<#(NSString *)#> code:<#(NSInteger)#> userInfo:<#(NSDictionary *)#>]
+    return [NSError errorWithDomain:KSGithubStatusErrorDomain
+                               code:KSGithubUnreachableError
+                           userInfo:@{
+         NSLocalizedDescriptionKey : NSLocalizedString(@"Github Status Error", @"Error title"),
+NSLocalizedRecoverySuggestionErrorKey : NSLocalizedString(@"Github is unreachable.", @"Can't access Github")}];
 }
 
-- (NSError *)requestFailedError
+- (NSError *)unknownError
 {
-    
+    return [NSError errorWithDomain:KSGithubStatusErrorDomain
+                               code:KSGithubUnknownError
+                           userInfo:@{
+         NSLocalizedDescriptionKey : NSLocalizedString(@"Github Status Error", @"Error title"),
+NSLocalizedRecoverySuggestionErrorKey : NSLocalizedString(@"An unknown error occurred.", @"Unknown error text")}];
 }
 
 @end
