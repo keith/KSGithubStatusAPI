@@ -13,9 +13,12 @@
 		C2B74F901695FF5B0083AC2B /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = C2B74F8E1695FF5B0083AC2B /* Credits.rtf */; };
 		C2B74F931695FF5B0083AC2B /* KSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C2B74F921695FF5B0083AC2B /* KSAppDelegate.m */; };
 		C2B74F961695FF5C0083AC2B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = C2B74F941695FF5C0083AC2B /* MainMenu.xib */; };
+		C2B74FA5169601C60083AC2B /* KSGithubStatusAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = C2B74FA4169601C60083AC2B /* KSGithubStatusAPI.m */; };
+		C4FB9ADD5B234F6896A4DB86 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 514C9FE42F854487AFAEF5F7 /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		514C9FE42F854487AFAEF5F7 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2B74F7B1695FF5B0083AC2B /* KSGithubStatusAPI Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KSGithubStatusAPI Mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2B74F7F1695FF5B0083AC2B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		C2B74F821695FF5B0083AC2B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -29,6 +32,9 @@
 		C2B74F911695FF5B0083AC2B /* KSAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KSAppDelegate.h; sourceTree = "<group>"; };
 		C2B74F921695FF5B0083AC2B /* KSAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KSAppDelegate.m; sourceTree = "<group>"; };
 		C2B74F951695FF5C0083AC2B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		C2B74FA3169601C60083AC2B /* KSGithubStatusAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KSGithubStatusAPI.h; path = ../../../KSGithubStatusAPI.h; sourceTree = "<group>"; };
+		C2B74FA4169601C60083AC2B /* KSGithubStatusAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KSGithubStatusAPI.m; path = ../../../KSGithubStatusAPI.m; sourceTree = "<group>"; };
+		D2C79ED1168E459EB3FC04B3 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,6 +43,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C2B74F801695FF5B0083AC2B /* Cocoa.framework in Frameworks */,
+				C4FB9ADD5B234F6896A4DB86 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -49,6 +56,7 @@
 				C2B74F851695FF5B0083AC2B /* KSGithubStatusAPI Mac */,
 				C2B74F7E1695FF5B0083AC2B /* Frameworks */,
 				C2B74F7C1695FF5B0083AC2B /* Products */,
+				D2C79ED1168E459EB3FC04B3 /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -65,6 +73,7 @@
 			children = (
 				C2B74F7F1695FF5B0083AC2B /* Cocoa.framework */,
 				C2B74F811695FF5B0083AC2B /* Other Frameworks */,
+				514C9FE42F854487AFAEF5F7 /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -84,6 +93,7 @@
 			children = (
 				C2B74F911695FF5B0083AC2B /* KSAppDelegate.h */,
 				C2B74F921695FF5B0083AC2B /* KSAppDelegate.m */,
+				C2B74FA7169601CB0083AC2B /* KSGithubStatusAPI */,
 				C2B74F941695FF5C0083AC2B /* MainMenu.xib */,
 				C2B74F861695FF5B0083AC2B /* Supporting Files */,
 			);
@@ -102,6 +112,15 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		C2B74FA7169601CB0083AC2B /* KSGithubStatusAPI */ = {
+			isa = PBXGroup;
+			children = (
+				C2B74FA3169601C60083AC2B /* KSGithubStatusAPI.h */,
+				C2B74FA4169601C60083AC2B /* KSGithubStatusAPI.m */,
+			);
+			name = KSGithubStatusAPI;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -112,6 +131,7 @@
 				C2B74F771695FF5B0083AC2B /* Sources */,
 				C2B74F781695FF5B0083AC2B /* Frameworks */,
 				C2B74F791695FF5B0083AC2B /* Resources */,
+				F56C541C57D74E3E9202E222 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -162,6 +182,23 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		F56C541C57D74E3E9202E222 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		C2B74F771695FF5B0083AC2B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -169,6 +206,7 @@
 			files = (
 				C2B74F8C1695FF5B0083AC2B /* main.m in Sources */,
 				C2B74F931695FF5B0083AC2B /* KSAppDelegate.m in Sources */,
+				C2B74FA5169601C60083AC2B /* KSGithubStatusAPI.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,6 +295,7 @@
 		};
 		C2B74F9A1695FF5C0083AC2B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D2C79ED1168E459EB3FC04B3 /* Pods.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -269,6 +308,7 @@
 		};
 		C2B74F9B1695FF5C0083AC2B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D2C79ED1168E459EB3FC04B3 /* Pods.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -298,6 +338,7 @@
 				C2B74F9B1695FF5C0083AC2B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
