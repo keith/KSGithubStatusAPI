@@ -45,7 +45,7 @@ extern NSString * const KSGithubStatusErrorDomain;
 // Attempt to refresh the status (use checkStatus: instead)
 - (void)refresh;
 
-// Returns a bool based of the most recent status
+// Returns a bool based of the most recent status (use currentStatus instead)
 - (BOOL)isGithubAvailable;
 
 // Returns all the data returned from github including the message, status, and updated date along with another pretty formatted date
