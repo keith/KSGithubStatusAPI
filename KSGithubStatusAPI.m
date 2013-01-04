@@ -111,12 +111,12 @@ NSString * const KSGithubStatusErrorDomain = @"com.keithsmiley.KSGithubStatusAPI
         if ([JSON valueForKey:kGithubDateKey])
         {
             NSString *dateString = [JSON valueForKey:kGithubDateKey];
-#if TARGET_OS_IPHONE
+#if __IPHONE_5_0
             NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
             [formatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"];
             [formatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
             NSDate *githubUpdateDate = [formatter dateFromString:[JSON valueForKey:kGithubDateKey]];
-#elif TARGET_OS_MAC
+#else
             NSDate *githubUpdateDate = [NSDate dateWithNaturalLanguageString:[JSON valueForKey:kGithubDateKey]];
 #endif
             
