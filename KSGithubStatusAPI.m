@@ -111,7 +111,15 @@ NSString * const KSGithubStatusErrorDomain = @"com.keithsmiley.KSGithubStatusAPI
         if ([JSON valueForKey:kGithubDateKey])
         {
             NSString *dateString = [JSON valueForKey:kGithubDateKey];
+#if TARGET_OS_IPHONE
+            NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+            [formatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"];
+            [formatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+            NSDate *githubUpdateDate = [formatter dateFromString:[JSON valueForKey:kGithubDateKey]];
+#elif TARGET_OS_MAC
             NSDate *githubUpdateDate = [NSDate dateWithNaturalLanguageString:[JSON valueForKey:kGithubDateKey]];
+#endif
+            
             if (githubUpdateDate)
             {
                 [self setCurrentStatusWithStatus:[JSON valueForKey:kGithubStatusKey]
@@ -134,7 +142,7 @@ NSString * const KSGithubStatusErrorDomain = @"com.keithsmiley.KSGithubStatusAPI
                                         date:nil
                                   prettyDate:nil];
         }
-        
+
         if (block) {
             if ([self isGithubAvailable]) {
                 block(@YES, nil);
@@ -203,7 +211,25 @@ NSString * const KSGithubStatusErrorDomain = @"com.keithsmiley.KSGithubStatusAPI
                               date:(NSDate *)date
                         prettyDate:(NSString *)prettyDate
 {
-    self.currentGithubStatus = @{kGithubStatusKey : status, kGithubMessageKey : message, kGithubDateKey : date, kGithubPrettyDateKey : prettyDate};
+    NSMutableDictionary *tempStatus = [NSMutableDictionary dictionary];
+    if (status) {
+        [tempStatus setValue:status forKey:kGithubStatusKey];
+    }
+    
+    if (message) {
+        [tempStatus setValue:message forKey:kGithubMessageKey];
+    }
+    
+    if (date) {
+        [tempStatus setValue:date forKey:kGithubDateKey];
+    }
+    
+    if (prettyDate) {
+        [tempStatus setValue:prettyDate forKey:kGithubPrettyDateKey];
+    }
+    
+    self.currentGithubStatus = [tempStatus copy];
+    tempStatus = nil;
 }
 
 - (NSDate *)lastCheckedDate
