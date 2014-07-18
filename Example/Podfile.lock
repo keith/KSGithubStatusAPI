@@ -1,7 +1,5 @@
 PODS:
-  - AFNetworking (1.1.0)
   - KSGithubStatusAPI (0.1.0):
-    - AFNetworking (~> 1.1.0)
     - Reachability (~> 3.1.0)
   - Reachability (3.1.1)
 
@@ -13,8 +11,7 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  AFNetworking: e1ee63e577c68e1d5004ccedb7367eda41f65943
-  KSGithubStatusAPI: 36b4698b4159db24c36936052e7d93055fc3d1ea
+  KSGithubStatusAPI: 650782a89a3e28733024823f64a9e88d61336d83
   Reachability: 8e9635e3cb4f98e7f825e51147f677ecc694d0e7
 
 COCOAPODS: 0.33.1

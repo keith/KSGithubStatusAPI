@@ -10,6 +10,5 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.7'
   s.source_files = '*.{h,m}'
   s.requires_arc = true
-  s.dependency 'AFNetworking', '~> 1.1.0'
   s.dependency 'Reachability', '~> 3.1.0'
 end
