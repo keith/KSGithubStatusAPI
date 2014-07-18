@@ -5,20 +5,20 @@ This API Controller use Github's [system status API](https://github.com/blog/134
 
 ## Usage
 
-It's extremely simple to use:
-
-    [[KSGithubStatusAPI sharedClient] checkStatus:^(NSNumber *available, NSError *error) {
-        if ([available boolValue]) {
-            NSLog(@"Github is available");
-        } else {
-            NSLog(@"Github isn't available");
-        }
-        
-        NSLog(@"Details: %@", [[KSGithubStatusAPI sharedClient] currentStatusDetails]);
-        
-        NSLog(@"Last Checked: %@", [[KSGithubStatusAPI sharedClient] lastCheckedDate]);
-        NSLog(@"Last Checked Pretty: %@", [[KSGithubStatusAPI sharedClient] lastCheckedPrettyDate]);
-    }];
+```objc
+[[KSGithubStatusAPI sharedClient] checkStatus:^(NSNumber *available, NSError *error) {
+    if ([available boolValue]) {
+        NSLog(@"Github is available");
+    } else {
+        NSLog(@"Github isn't available");
+    }
+    
+    NSLog(@"Details: %@", [[KSGithubStatusAPI sharedClient] currentStatusDetails]);
+    
+    NSLog(@"Last Checked: %@", [[KSGithubStatusAPI sharedClient] lastCheckedDate]);
+    NSLog(@"Last Checked Pretty: %@", [[KSGithubStatusAPI sharedClient] lastCheckedPrettyDate]);
+}];
+```
 
 ### Installation
 
