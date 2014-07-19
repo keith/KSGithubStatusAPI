@@ -14,7 +14,7 @@ typedef NS_ENUM(NSInteger, KSGithubStatusState) {
     KSGithubStatusUnreachable
 };
 
-@interface KSGithubStatus : NSObject
+@interface KSGithubStatus : NSObject <NSCoding>
 
 @property (nonatomic, readonly) NSString *status;
 @property (nonatomic, readonly) NSString *details;

@@ -1,17 +1,17 @@
 PODS:
-  - KSGithubStatusAPI (0.1.0):
+  - KSGithubStatusAPI (0.2.0):
     - Reachability (~> 3.1.0)
   - Reachability (3.1.1)
 
 DEPENDENCIES:
-  - KSGithubStatusAPI (from `../`)
+  - KSGithubStatusAPI (from `..`)
 
 EXTERNAL SOURCES:
   KSGithubStatusAPI:
-    :path: ../
+    :path: ..
 
 SPEC CHECKSUMS:
-  KSGithubStatusAPI: 650782a89a3e28733024823f64a9e88d61336d83
+  KSGithubStatusAPI: 1ddaf4f88bcd32051dcc5000f2e4133cb06492c7
   Reachability: 8e9635e3cb4f98e7f825e51147f677ecc694d0e7
 
 COCOAPODS: 0.33.1

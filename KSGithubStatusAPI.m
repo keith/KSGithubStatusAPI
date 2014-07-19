@@ -14,15 +14,11 @@ static NSString * const KSGithubAPIURLString = @"https://status.github.com/api/l
 static NSString * const KSGithubStatusReachabilityString = @"status.github.com";
 static NSString * const KSGithubReachabilityString = @"github.com";
 
-static NSString * const KSGithubLastCheckedKey = @"githubAvailabilityLastChecked";
-NSString * const KSGithubStatusErrorDomain = @"com.keithsmiley.KSGithubStatusAPI";
-
+static NSString * const KSGithubLastStatusKey = @"KSGithubStatusAPILastStatus";
 
 @interface KSGithubStatusAPI ()
 
 @property (nonatomic, readwrite) KSGithubStatus *lastStatus;
-@property (nonatomic, readwrite) NSDate *lastCheckedDate;
-@property (nonatomic, readwrite) NSString *readableLastCheckedDate;
 
 @end
 
@@ -38,6 +34,12 @@ NSString * const KSGithubStatusErrorDomain = @"com.keithsmiley.KSGithubStatusAPI
 - (BOOL)isGithubReachable
 {
     return [[Reachability reachabilityWithHostname:KSGithubReachabilityString] isReachable];
+}
+
+- (void)dealloc
+{
+    NSData *statusData = [NSKeyedArchiver archivedDataWithRootObject:self.lastStatus];
+    [[NSUserDefaults standardUserDefaults] setObject:statusData forKey:KSGithubLastStatusKey];
 }
 
 - (void)checkStatus:(KSGithubStatusBlock)block
@@ -88,26 +90,24 @@ NSString * const KSGithubStatusErrorDomain = @"com.keithsmiley.KSGithubStatusAPI
     return [NSURLRequest requestWithURL:requestURL cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:30];
 }
 
-- (void)setLastStatus:(KSGithubStatus *)lastStatus
+- (KSGithubStatus *)lastStatus
 {
-    _lastStatus = lastStatus;
-    self.lastCheckedDate = lastStatus.createdAtDate;
-    self.readableLastCheckedDate = lastStatus.readableCreatedAtDate;
-}
+    if (!_lastStatus) {
+        NSData *data = [[NSUserDefaults standardUserDefaults] dataForKey:KSGithubLastStatusKey];
+        _lastStatus = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    }
 
-- (void)setLastCheckedDate:(NSDate *)lastCheckedDate
-{
-    [[NSUserDefaults standardUserDefaults] setObject:lastCheckedDate forKey:KSGithubLastCheckedKey];
-    _lastCheckedDate = lastCheckedDate;
+    return _lastStatus;
 }
 
 - (NSDate *)lastCheckedDate
 {
-    if (!_lastCheckedDate) {
-        _lastCheckedDate = [[NSUserDefaults standardUserDefaults] objectForKey:KSGithubLastCheckedKey];
-    }
+    return self.lastStatus.createdAtDate;
+}
 
-    return _lastCheckedDate;
+- (NSString *)readableLastCheckedDate
+{
+    return self.lastStatus.readableCreatedAtDate;
 }
 
 @end

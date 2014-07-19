@@ -1,1 +1,1 @@
-pod 'KSGithubStatusAPI', :path => '../'
+pod 'KSGithubStatusAPI', :path => '..'

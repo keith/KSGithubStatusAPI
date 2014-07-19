@@ -7,22 +7,22 @@
 #import "KSGithubStatus.h"
 #import "NSDictionary+KSAdditions.h"
 
+// From https://gist.github.com/kyleve/8213806 renamed for collisions
+#define KSSQKeyPath(object, keyPath) ({ if (NO) { (void)((object).keyPath); } @#keyPath; })
+
 static NSString * const KSGithubNormalStatus = @"good";
 static NSString * const KSGithubMinorStatus = @"minor";
 static NSString * const KSGithubErrorStatus = @"error";
 static NSString * const KSGithubDateFormat = @"yyyy-MM-dd'T'HH:mm:ss'Z'";
 
-
 @interface KSGithubStatus ()
 
+@property (nonatomic) KSGithubStatusState currentState;
 @property (nonatomic, readwrite) NSString *status;
 @property (nonatomic, readwrite) NSString *details;
 @property (nonatomic, readwrite) NSDate *createdAtDate;
-@property (nonatomic, readwrite) NSString *readableCreatedAtDate;
 @property (nonatomic, readwrite) NSDate *githubUpdatedDate;
-@property (nonatomic, readwrite) NSString *readableGithubUpdatedDate;
 
-@property (nonatomic) KSGithubStatusState currentState;
 @property (nonatomic) NSArray *validStates;
 @property (nonatomic) NSDateFormatter *dateFormatter;
 @property (nonatomic) NSDateFormatter *readableDateFormatter;
@@ -169,20 +169,37 @@ static NSString * const KSGithubDateFormat = @"yyyy-MM-dd'T'HH:mm:ss'Z'";
 
 - (NSString *)readableCreatedAtDate
 {
-    if (!_readableCreatedAtDate) {
-        _readableCreatedAtDate = [self.readableDateFormatter stringFromDate:self.createdAtDate];
-    }
-
-    return _readableCreatedAtDate;
+    return [self.readableDateFormatter stringFromDate:self.createdAtDate];
 }
 
 - (NSString *)readableGithubUpdatedDate
 {
-    if (!_readableGithubUpdatedDate) {
-        _readableGithubUpdatedDate = [self.readableDateFormatter stringFromDate:self.githubUpdatedDate];
-    }
+    return [self.readableDateFormatter stringFromDate:self.githubUpdatedDate];
+}
 
-    return _readableGithubUpdatedDate;
+#pragma mark - NSCoding
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [aCoder setValue:@(self.currentState) forKey:KSSQKeyPath(self, currentState)];
+    [aCoder setValue:self.status forKey:KSSQKeyPath(self, status)];
+    [aCoder setValue:self.details forKey:KSSQKeyPath(self, details)];
+    [aCoder setValue:self.createdAtDate forKey:KSSQKeyPath(self, createdAtDate)];
+    [aCoder setValue:self.githubUpdatedDate forKey:KSSQKeyPath(self, githubUpdatedDate)];
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [self init];
+    if (!self) return nil;
+
+    self.currentState = [[aDecoder decodeObjectForKey:KSSQKeyPath(self, currentState)] integerValue];
+    self.status = [aDecoder decodeObjectForKey:KSSQKeyPath(self, status)];
+    self.details = [aDecoder decodeObjectForKey:KSSQKeyPath(self, details)];
+    self.createdAtDate = [aDecoder decodeObjectForKey:KSSQKeyPath(self, createdAtDate)];
+    self.githubUpdatedDate = [aDecoder decodeObjectForKey:KSSQKeyPath(self, githubUpdatedDate)];
+
+    return self;
 }
 
 @end
