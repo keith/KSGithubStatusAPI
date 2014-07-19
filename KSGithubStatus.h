@@ -16,6 +16,8 @@ typedef NS_ENUM(NSInteger, KSGithubStatusState) {
 
 @interface KSGithubStatus : NSObject <NSCoding>
 
+@property (nonatomic, readonly) KSGithubStatusState currentState;
+
 @property (nonatomic, readonly) NSString *status;
 @property (nonatomic, readonly) NSString *details;
 

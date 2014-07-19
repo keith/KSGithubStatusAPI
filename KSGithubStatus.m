@@ -17,7 +17,7 @@ static NSString * const KSGithubDateFormat = @"yyyy-MM-dd'T'HH:mm:ss'Z'";
 
 @interface KSGithubStatus ()
 
-@property (nonatomic) KSGithubStatusState currentState;
+@property (nonatomic, readwrite) KSGithubStatusState currentState;
 @property (nonatomic, readwrite) NSString *status;
 @property (nonatomic, readwrite) NSString *details;
 @property (nonatomic, readwrite) NSDate *createdAtDate;
