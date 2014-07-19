@@ -181,11 +181,11 @@ static NSString * const KSGithubDateFormat = @"yyyy-MM-dd'T'HH:mm:ss'Z'";
 
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
-    [aCoder setValue:@(self.currentState) forKey:KSSQKeyPath(self, currentState)];
-    [aCoder setValue:self.status forKey:KSSQKeyPath(self, status)];
-    [aCoder setValue:self.details forKey:KSSQKeyPath(self, details)];
-    [aCoder setValue:self.createdAtDate forKey:KSSQKeyPath(self, createdAtDate)];
-    [aCoder setValue:self.githubUpdatedDate forKey:KSSQKeyPath(self, githubUpdatedDate)];
+    [aCoder encodeInteger:self.currentState forKey:KSSQKeyPath(self, currentState)];
+    [aCoder encodeObject:self.status forKey:KSSQKeyPath(self, status)];
+    [aCoder encodeObject:self.details forKey:KSSQKeyPath(self, details)];
+    [aCoder encodeObject:self.createdAtDate forKey:KSSQKeyPath(self, createdAtDate)];
+    [aCoder encodeObject:self.githubUpdatedDate forKey:KSSQKeyPath(self, githubUpdatedDate)];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
@@ -193,7 +193,7 @@ static NSString * const KSGithubDateFormat = @"yyyy-MM-dd'T'HH:mm:ss'Z'";
     self = [self init];
     if (!self) return nil;
 
-    self.currentState = [[aDecoder decodeObjectForKey:KSSQKeyPath(self, currentState)] integerValue];
+    self.currentState = [aDecoder decodeIntegerForKey:KSSQKeyPath(self, currentState)];
     self.status = [aDecoder decodeObjectForKey:KSSQKeyPath(self, status)];
     self.details = [aDecoder decodeObjectForKey:KSSQKeyPath(self, details)];
     self.createdAtDate = [aDecoder decodeObjectForKey:KSSQKeyPath(self, createdAtDate)];
