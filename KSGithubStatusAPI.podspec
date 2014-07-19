@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'KSGithubStatusAPI'
-  s.version      = '0.2.1'
+  s.version      = '0.2.2'
   s.summary      = 'A simple Objective-C API controller for status.github.com.'
   s.homepage     = 'https://github.com/Keithbsmiley/KSGithubStatusAPI'
   s.license      = 'MIT'
