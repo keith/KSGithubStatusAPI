@@ -158,7 +158,6 @@ static NSString * const KSGithubDateFormat = @"yyyy-MM-dd'T'HH:mm:ss'Z'";
 {
     if (!_readableDateFormatter) {
         _readableDateFormatter = [[NSDateFormatter alloc] init];
-        _readableDateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
         _readableDateFormatter.locale = [NSLocale currentLocale];
         _readableDateFormatter.timeStyle = NSDateFormatterShortStyle;
         _readableDateFormatter.dateStyle = NSDateFormatterShortStyle;
