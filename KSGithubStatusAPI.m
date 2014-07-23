@@ -71,16 +71,18 @@ static NSString * const KSGithubLastStatusKey = @"KSGithubStatusAPILastStatus";
     [[[NSURLSession sharedSession] dataTaskWithRequest:[self requestForStatusAPI]
                                     completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
     {
-        if (error) {
-            self.lastStatus = [KSGithubStatus statusWithState:KSGithubStatusUnknown];
-            block(self.lastStatus);
-            return;
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (error) {
+                self.lastStatus = [KSGithubStatus statusWithState:KSGithubStatusUnknown];
+                block(self.lastStatus);
+                return;
+            }
 
-        NSDictionary *JSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-        KSGithubStatus *status = [KSGithubStatus statusWithJSON:JSON];
-        self.lastStatus = status;
-        block(self.lastStatus);
+            NSDictionary *JSON = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+            KSGithubStatus *status = [KSGithubStatus statusWithJSON:JSON];
+            self.lastStatus = status;
+            block(self.lastStatus);
+        });
     }] resume];
 }
 
